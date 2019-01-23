@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 //二分搜索树中的每个元素必须具有可比较性
 public class BST<E extends Comparable<E>> {
@@ -130,6 +133,29 @@ public class BST<E extends Comparable<E>> {
         preOrder(node.right);
     }
 
+
+    //前序遍历的非递归实现
+    private void preOrderNR(){
+        //辅助用的栈结构
+        Stack<Node> stack = new Stack<>();
+        stack.push(root);
+        //每个节点进栈 , 然后出栈 , 并把节点的左右节点压入栈中
+        //如果栈为空 , 则表示结束
+        while(!stack.isEmpty()){
+            Node temp = stack.pop();
+            System.out.println(temp.e);
+
+            //因为需要先访问左节点 , 而且使用的结构是栈
+            //所以需要把右节点先入栈 , 然后左节点再入栈
+            //这样左节点才在右节点的上方
+            if(temp.right != null)
+                stack.push(temp.right);
+            if(temp.left != null)
+                stack.push(temp.left);
+
+        }
+    }
+
     //中序遍历
     public void inOrder(){
         inOrder(root);
@@ -192,6 +218,81 @@ public class BST<E extends Comparable<E>> {
     }
 
 
+    //层序遍历
+    public void levelOrder(){
+        Queue<Node> q = new LinkedList<>();
+        //根节点入队
+        q.add(root);
+
+        //判断队列是否为空
+        //队列不为空的时候 , 循环执行
+        while(!q.isEmpty()){
+            //出队元素 , 进行访问
+            Node temp = q.remove();
+            System.out.println(temp.e);
+
+            //此节点的左右节点依次入队 , 为下次循环做好准备
+            if(temp.left != null)
+                q.add(temp.left);
+            if(temp.right != null)
+                q.add(temp.right);
+
+        }
+    }
+
+    //寻找二分搜索树中的最小值
+    public E minimum(){
+        if(size == 0)
+            throw new IllegalArgumentException("BST is empty!!!");
+        return minimum(root).e;
+    }
+
+    //递归实现
+    private Node minimum(Node node){
+        if(node.left == null)
+            return node;
+
+        return minimum(node.left);
+    }
+
+    //非递归实现
+    private E minimumNR(){
+        Node temp = root;
+        while(temp.left != null){
+            temp = temp.left;
+        }
+
+        return temp.e;
+    }
+
+
+    //求最大值
+    public E maximum(){
+        if(size == 0)
+            throw new IllegalArgumentException("BST is empty!!!");
+        return maximum(root).e;
+    }
+
+    //递归实现
+    private Node maximum(Node node){
+        if(node.right == null)
+            return node;
+
+        return maximum(node.right);
+    }
+
+    //非递归实现
+    private E maximumNR(){
+        Node temp = root;
+        while(temp.right != null){
+            temp = temp.right;
+        }
+
+        return temp.e;
+    }
+
+
+
 
     public static void main(String[] args) {
 
@@ -209,9 +310,13 @@ public class BST<E extends Comparable<E>> {
         /////////////////
         //bst.preOrder();
 
-        System.out.println(bst);
+        System.out.println(bst.minimum());
+        System.out.println(bst.minimumNR());
 
-        //bst.inOrder();
+        System.out.println(bst.maximum());
+        System.out.println(bst.maximumNR());
+        //bst.preOrderNR();
+        //bst.levelOrder();
         //System.out.println(bst);
     }
 
