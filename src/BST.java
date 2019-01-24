@@ -292,7 +292,142 @@ public class BST<E extends Comparable<E>> {
     }
 
 
+    //删除最小值
+    public E removeMin(){
+        //找到最小节点
+        E ret = minimum();
 
+        //删除最小节点 , 并更新root
+        root = removeMin(root);
+
+        return ret;
+    }
+
+    private Node removeMin(Node node){
+
+        if(node.left == null){
+            //删除最小节点
+            //保存最小节点的右节点
+            Node temp = node.right;
+            node.right = null;
+            //有效元素减1
+            size--;
+            return temp;
+        }
+
+        node.left = removeMin(node.left);
+        return node;
+    }
+
+    //删除最大节点
+    public E removeMax(){
+        E ret = maximum();
+        root = removeMax(root);
+        return ret;
+    }
+
+    //删除以node为根节点的二叉搜索树中的最大节点
+    //并返回删除后的根节点
+    private Node removeMax(Node node){
+        //结束的条件
+        //当node的右节点为空时 , 代表当前就是需要删除的节点
+        if(node.right == null){
+            //删除当前的节点
+            //删除当前节点 , 并返回删除之后的树的根节点
+            //由因为是最大值 , 所以当前节点必定没有右子树
+            //所以返回当前节点的左子树即可
+
+            //使用指针指向当前节点的右子树
+            Node temp = node.left;
+            //断开当前节点
+            node.left = null;
+            //有效元素减1
+            size--;
+            //返回右节点的地址
+            return temp;
+        }
+
+
+        //当前的解 = 当前节点的左指针 +(挂上) 当前节点的右子树删除最大元素之后的树
+        node.right = removeMax(node.right);
+        //返回当前树的根节点
+        return node;
+
+    }
+
+    //删除树中的某个节点
+    public void remove(E e){
+        remove(root , e);
+    }
+
+    //删除树中某个指定的元素
+    //返回删除元素之后的树根
+    private Node remove(Node node , E e){
+
+        //结束的条件
+        //找到元素 或者 没有找到元素
+
+        //没有找到元素
+        if(node == null){
+            return null;
+        }
+
+        //找到了元素 , 删除元素
+        if(e.compareTo(node.e) == 0){
+            //情况一 : 当前节点没有左子树
+            if(node.left == null){
+                Node temp = node.right;
+                node.right = null;
+                size--;
+                return temp;
+            //情况二 : 当前节点没有右子树
+            }else if(node.right == null){
+                Node temp = node.left;
+                node.left = null;
+                size--;
+                return temp;
+            }
+            //情况三 : 左右子树都不为空
+            else{
+                //首先找到以node.right为根 , 这个树中的最小值successor
+                //把successor作为替代的根即可
+                Node successor = minimum(node.right);
+                E temp = successor.e;
+                Node rootTemp = new Node(temp);
+                Node nodeRight = removeMin(node.right);
+                rootTemp.left = node.left;
+                rootTemp.right = nodeRight;
+                return rootTemp;
+            }
+
+            //return null;
+        }
+
+        //首先判断e往哪边走
+        if(e.compareTo(node.e) < 0){
+            //往左边走
+            //当前解 = node.left + remove(node.left , e)
+            node.left = remove(node.left , e);
+            return node;
+        }else{
+            //往右边走
+            node.right = remove(node.right , e);
+            return node;
+        }
+
+        //return null;
+    }
+
+
+
+    public static int sum(int n){
+
+        if(n == 0){
+            return 0;
+        }
+        int temp = n + sum(n - 1);
+        return temp;
+    }
 
     public static void main(String[] args) {
 
@@ -309,15 +444,10 @@ public class BST<E extends Comparable<E>> {
         // 2  4     8  //
         /////////////////
         //bst.preOrder();
-
-        System.out.println(bst.minimum());
-        System.out.println(bst.minimumNR());
-
-        System.out.println(bst.maximum());
-        System.out.println(bst.maximumNR());
-        //bst.preOrderNR();
-        //bst.levelOrder();
-        //System.out.println(bst);
+        bst.remove(3);
+        //System.out.println();
+        System.out.println(bst);
+        bst.levelOrder();
     }
 
 
