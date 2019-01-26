@@ -8,6 +8,8 @@ public class BST<E extends Comparable<E>> {
         public E e;
         public Node left;
         public Node right;
+        int depth;  //节点的深度
+        int count = 1;  //重复节点计数
 
         public Node(E e){
             this.e = e;
@@ -37,8 +39,11 @@ public class BST<E extends Comparable<E>> {
         if(root == null){
             root = new Node(e);
             size++;
+            root.depth = 0;
         }else
-            add(root , e);
+            //向root为根节点的数插入元素 , 初始的高度是0
+            //因为 , 如果root==null , 那么插入的元素就是根节点 , 根的深度为0
+            add(root , e , 0);
     }
 
     //向以node为根节点的二叉搜索树添加元素
@@ -71,13 +76,15 @@ public class BST<E extends Comparable<E>> {
 
     //改进上面的添加函数
     //向以node为根节点的二叉搜索树中插入元素 , 并返回这颗树的根节点
-    private Node add(Node node , E e){
+    private Node add(Node node , E e , int depth){
         //递归结束的条件 : 当传入的node为null时 , 就需要创建节点了
         if(node == null){
             //一个节点可以看做是一颗二叉搜索树 , 所以返回这颗树的根节点
             size++;
             //就是返回node
-            return new Node(e);
+            Node temp = new Node(e);
+            temp.depth = depth;
+            return temp;
         }
 
         //更小的规模
@@ -85,11 +92,17 @@ public class BST<E extends Comparable<E>> {
         if(e.compareTo(node.e) < 0)
             //因为add函数返回的是以node.left为节点的二叉树
             //所以需要接在当前的树上
-            node.left = add(node.left , e);
+            //因为是插入子树 , 所以depth的深度需要加1
+            node.left = add(node.left , e , depth + 1);
         //因为有等于的情况没有判断 , 所以不能直接使用else
         //会把等于的情况包括进去
         else if(e.compareTo(node.e) > 0)
-            node.right = add(node.right , e);
+            //因为是插入子树 , 所以depth的深度需要加1
+            node.right = add(node.right , e , depth + 1);
+        else{
+            //相等 , 当前元素的count加1
+            node.count += 1;
+        }
 
         return node;
     }
@@ -114,6 +127,32 @@ public class BST<E extends Comparable<E>> {
             return contain(node.left , e);
         }else
             return contain(node.right , e);
+    }
+
+    //寻找指定的元素
+    public Node findNode(E e){return findNode(root , e);}
+
+    //以node为根节点 , 寻找值为e的节点
+    private Node findNode(Node node , E e){
+
+        //结束条件
+        //找到了
+        if(e.compareTo(node.e) == 0){
+            return node;
+        }
+
+        //没有找到
+        if(node == null){
+            return null;
+        }
+
+        //当前解
+        if(e.compareTo(node.e) < 0){
+            //从当前节点的左子树中寻找
+            return findNode(node.left , e);
+        }else{
+            return findNode(node.right , e);
+        }
     }
 
     //前序遍历
@@ -436,6 +475,7 @@ public class BST<E extends Comparable<E>> {
         for(int num: nums)
             bst.add(num);
 
+        bst.add(5);
         /////////////////
         //      5      //
         //    /   \    //
@@ -444,10 +484,10 @@ public class BST<E extends Comparable<E>> {
         // 2  4     8  //
         /////////////////
         //bst.preOrder();
-        bst.remove(3);
+        //bst.remove(3);
         //System.out.println();
-        System.out.println(bst);
-        bst.levelOrder();
+        System.out.println(bst.findNode(5).count);
+        //bst.levelOrder();
     }
 
 
